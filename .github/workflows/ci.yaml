@@ -102,7 +102,7 @@ jobs:
         sudo add-apt-repository ppa:hvr/ghc -y
         sudo apt-get update
         sudo apt-get install ghc-${{ matrix.ghc }}
-    - name: Install Stack and GHC
+    - name: Install Stack
       run: |
         set -ex
         curl -sSL https://get.haskellstack.org/ | sh -s - -f
