@@ -125,7 +125,7 @@ mkSzFail ix = do
         pure acc'
   Sz ix <$ foldlIndex (\acc i -> acc >>= guardNegativeOverflow i) (pure 1) ix
 
-instance (Index ix, Serialise ix) => Serialise (Sz ix) where
+instance Index ix => Serialise (Sz ix) where
   encode = encodeIx . unSz
   decode = mkSzFail =<< decodeIx
 
@@ -140,7 +140,6 @@ encodeArray ::
      , Mutable (ARepr v) ix e
      , VG.Vector v e
      , VRepr (ARepr v) ~ v
-     , Serialise ix
      , Serialise (v e)
      )
   => Array r ix e
@@ -157,7 +156,6 @@ decodeArray ::
      , VG.Vector v e
      , Mutable (ARepr v) ix e
      , Mutable r ix e
-     , Serialise ix
      , Serialise (v e)
      )
   => Decoder s (Array r ix e)
@@ -168,23 +166,23 @@ decodeArray = do
   -- setComp is to workaround a minor bug for boxed arrays in massiv < 0.6
   either (Fail.fail . show) (pure . setComp comp) $ fromVectorM comp sz vector
 
-instance (Index ix, Serialise ix, Serialise e) => Serialise (Array B ix e) where
+instance (Index ix, Serialise e) => Serialise (Array B ix e) where
   encode = encodeArray @V.Vector
   decode = decodeArray @V.Vector
 
-instance (Index ix, NFData e, Serialise ix, Serialise e) => Serialise (Array N ix e) where
+instance (Index ix, NFData e, Serialise e) => Serialise (Array N ix e) where
   encode = encode . unwrapNormalForm
   decode = evalNormalForm <$> decode
 
-instance (Index ix, Storable e, Serialise ix, Serialise e) => Serialise (Array S ix e) where
+instance (Index ix, Storable e, Serialise e) => Serialise (Array S ix e) where
   encode = encodeArray @VS.Vector
   decode = decodeArray @VS.Vector
 
-instance (Index ix, Unbox e, Serialise ix, Serialise e) => Serialise (Array U ix e) where
+instance (Index ix, Unbox e, Serialise e) => Serialise (Array U ix e) where
   encode = encodeArray @VU.Vector
   decode = decodeArray @VU.Vector
 
-instance (Index ix, Prim e, Serialise ix, Serialise e) => Serialise (Array P ix e) where
+instance (Index ix, Prim e, Serialise e) => Serialise (Array P ix e) where
   encode = encodeArray @VP.Vector
   decode = decodeArray @VP.Vector
 
