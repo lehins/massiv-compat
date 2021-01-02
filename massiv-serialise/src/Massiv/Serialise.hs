@@ -22,6 +22,8 @@
 --
 -- Array serialisation is done by falling back onto instances for `VG.Vector` types from
 -- [`vector`](https://hackage.haskell.org/package/vector) package.
+--
+-- A simple module import `import Massiv.Serialise ()` is needed in order to use provided instances.
 module Massiv.Serialise
   ( -- * Helper functions used to define Serialise instances
     encodeIx
@@ -34,18 +36,19 @@ module Massiv.Serialise
 import Codec.Serialise
 import Codec.Serialise.Decoding
 import Codec.Serialise.Encoding
-import Control.Monad
 import Control.DeepSeq (NFData)
+import Control.Monad
+import qualified Control.Monad.Fail as Fail
 import Data.Foldable as F
 import Data.Massiv.Array
 import Data.Massiv.Array.Manifest.Vector
 import Data.Proxy
+import Data.Typeable
 import qualified Data.Vector as V
 import qualified Data.Vector.Generic as VG
 import qualified Data.Vector.Primitive as VP
 import qualified Data.Vector.Storable as VS
 import qualified Data.Vector.Unboxed as VU
-import Data.Typeable
 
 instance Serialise Comp where
   encode comp =
@@ -59,7 +62,7 @@ instance Serialise Comp where
       0 -> pure Seq
       1 -> ParOn <$> decode
       2 -> ParN <$> decode
-      n -> fail $ "Unexpected Comp tag: " <> show n
+      n -> Fail.fail $ "Unexpected Comp tag: " <> show n
 
 
 
@@ -78,7 +81,7 @@ decodeIx ::
 decodeIx = do
   let decodeDim ix dim = do
         i <- decode
-        either (fail . show) pure $! setDimM ix dim i
+        either (Fail.fail . show) pure $! setDimM ix dim i
   F.foldlM decodeDim zeroIndex [1 .. dimensions (Proxy :: Proxy ix)]
 
 instance Serialise Ix2 where
@@ -94,12 +97,12 @@ instance Index (IxN n) => Serialise (IxN n) where
 -- | Construct size from index verifying its correctness.
 --
 -- @since 0.1.0
-mkSzFail :: (Index ix, MonadFail m) => ix -> m (Sz ix)
+mkSzFail :: (Index ix, Fail.MonadFail m) => ix -> m (Sz ix)
 mkSzFail ix = do
   let guardNegativeOverflow i !acc = do
-        when (i < 0) $ fail $ "Negative size encountered: " <> show i
+        when (i < 0) $ Fail.fail $ "Negative size encountered: " <> show i
         let acc' = i * acc
-        when (acc' /= 0 && acc' < acc) $ fail $ "Overflow detected, size is too big: " <> show i
+        when (acc' /= 0 && acc' < acc) $ Fail.fail $ "Overflow detected, size is too big: " <> show i
         pure acc'
   Sz ix <$ foldlIndex (\acc i -> acc >>= guardNegativeOverflow i) (pure 1) ix
 
@@ -144,7 +147,7 @@ decodeArray = do
   sz <- decode
   vector :: v e <- decode
   -- setComp is to workaround a minor bug for boxed arrays in massiv < 0.6
-  either (fail . show) (pure . setComp comp) $ fromVectorM comp sz vector
+  either (Fail.fail . show) (pure . setComp comp) $ fromVectorM comp sz vector
 
 instance (Index ix, Serialise ix, Serialise e) => Serialise (Array B ix e) where
   encode = encodeArray @V.Vector
