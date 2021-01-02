@@ -1,7 +1,7 @@
 name:                massiv-serialise
 version:             0.1.0.0
 synopsis:            Compatibility of 'massiv' with 'serialise'
-description:         Orphan `Serialise` class instances from <https://hackage.haskell.org/package/serialise serialise> package that allow serialization of arrays defined in <https://hackage.haskell.org/package/massiv massiv> package
+description:         Orphan 'Serialise' class instances from <https://hackage.haskell.org/package/serialise serialise> package that allow serialization of arrays defined in <https://hackage.haskell.org/package/massiv massiv> package
 homepage:            https://github.com/lehins/massiv-compat
 license:             BSD3
 license-file:        LICENSE
