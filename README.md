@@ -5,7 +5,7 @@ work with other packages available from Hackage.
 
 | Language | Github Actions |
 |:--------:|:--------------:|
-| ![GitHub top language](https://img.shields.io/github/languages/top/lehins/massiv-serialise.svg) | [![Build Status](https://github.com/lehins/massiv-compat/workflows/massiv-compat-CI/badge.svg)](https://github.com/lehins/massiv-compat/actions)
+| ![GitHub top language](https://img.shields.io/github/languages/top/lehins/massiv-compat.svg) | [![Build Status](https://github.com/lehins/massiv-compat/workflows/massiv-compat-CI/badge.svg)](https://github.com/lehins/massiv-compat/actions)
 
 |    Github Repo     | Hackage | Nightly | LTS | Compatibility with |
 |:-------------------|:-------:|:-------:|:---:|:------------------:|
