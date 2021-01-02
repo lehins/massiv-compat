@@ -15,15 +15,28 @@
 -- Stability   : experimental
 -- Portability : non-portable
 --
--- This package provides instances for `Serialise` class for all `Array` representations in
--- [massiv](https://hackage.haskell.org/package/massiv) package. These instances are
--- provided as orphans from a separate package in order to avoid direct dependency on
--- [`serialise`](https://hackage.haskell.org/package/serialise) package for `massiv`.
+-- This package provides instances for `Serialise` class for all mutable `Array`
+-- representations in [@massiv@](https://hackage.haskell.org/package/massiv) package. These
+-- instances are provided as orphans from a separate package in order to avoid direct
+-- dependency on [@serialise@](https://hackage.haskell.org/package/serialise) package in
+-- @massiv@.
 --
 -- Array serialisation is done by falling back onto instances for `VG.Vector` types from
--- [`vector`](https://hackage.haskell.org/package/vector) package.
+-- [@vector@](https://hackage.haskell.org/package/vector) package.
 --
--- A simple module import `import Massiv.Serialise ()` is needed in order to use provided instances.
+-- Below is a simple example how to use it. Note a blank module import: @import
+-- Massiv.Serialise ()@, which is the only thing needed from this module in order to use
+-- provided orphan instances.
+--
+-- >>> import Massiv.Serialise ()
+-- >>> import Data.Massiv.Array as A
+-- >>> let arr = A.fromList A.Seq [72,97,115,107,101,108,108] :: A.Vector A.P Int
+-- >>> serialise arr
+-- "\NUL\a\135\CANH\CANa\CANs\CANk\CANe\CANl\CANl"
+-- >>> deserialise (serialise arr) :: A.Vector A.P Int
+-- Array P Seq (Sz1 7)
+--   [ 72, 97, 115, 107, 101, 108, 108 ]
+--
 module Massiv.Serialise
   ( -- * Helper functions used to define Serialise instances
     encodeIx
@@ -69,7 +82,10 @@ instance Serialise Comp where
 -- | Encode index
 --
 -- @since 0.1.0
-encodeIx :: Index ix => ix -> Encoding
+encodeIx ::
+     forall ix. Index ix
+  => ix
+  -> Encoding
 encodeIx = foldlIndex (\ !acc i -> encode i <> acc) mempty
 
 -- | Decode index
@@ -97,7 +113,10 @@ instance Index (IxN n) => Serialise (IxN n) where
 -- | Construct size from index verifying its correctness.
 --
 -- @since 0.1.0
-mkSzFail :: (Index ix, Fail.MonadFail m) => ix -> m (Sz ix)
+mkSzFail ::
+     forall ix m. (Index ix, Fail.MonadFail m)
+  => ix
+  -> m (Sz ix)
 mkSzFail ix = do
   let guardNegativeOverflow i !acc = do
         when (i < 0) $ Fail.fail $ "Negative size encountered: " <> show i
