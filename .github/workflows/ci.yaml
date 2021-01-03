@@ -26,6 +26,8 @@ jobs:
         path: |
           massiv-serialise/${{ steps.setup-haskell-cabal.outputs.cabal-store }}
           massiv-serialise/dist-newstyle
+          massiv-persist/${{ steps.setup-haskell-cabal.outputs.cabal-store }}
+          massiv-persist/dist-newstyle
         key: ${{ runner.os }}-${{ matrix.ghc }}
     - name: Build and test
       run: |
@@ -33,6 +35,12 @@ jobs:
         cabal sdist -z -o .
         cabal get massiv-serialise-*.tar.gz
         cd massiv-serialise-*/
+        cabal test all
+
+        cd ../../massiv-persist
+        cabal sdist -z -o .
+        cabal get massiv-persist-*.tar.gz
+        cd massiv-persist-*/
         cabal test all
   build-stack:
     name: CI-stack
@@ -73,6 +81,7 @@ jobs:
         path: |
           ~/.stack
           massiv-serialise/.stack-work
+          massiv-persist/.stack-work
         key: ${{ runner.os }}-${{ matrix.resolver }}-${{ env.cache-version }}
         restore-keys: |
           ${{ runner.os }}-${{ matrix.resolver }}-${{ env.cache-version }}
@@ -84,6 +93,7 @@ jobs:
       run: |
         rm -r ~/.stack/setup-exe-cache
         rm -r massiv-serialise/.stack-work
+        rm -r massiv-persist/.stack-work
     - name: Windows Cache
       id: cache-windows
       uses: actions/cache@v2
@@ -112,4 +122,6 @@ jobs:
         [ -n "${{ matrix.ghc }}" ] && [ "${{ matrix.os }}" == "ubuntu-latest" ] && STACK_ARGS="$STACK_ARGS --system-ghc"
         [ -n "${{ matrix.stack-yaml }}" ] && STACK_YAML=${{ matrix.stack-yaml }}
         cd massiv-serialise
+        stack $STACK_ARGS test --bench --no-run-benchmarks --haddock --no-haddock-deps
+        cd ../massiv-persist
         stack $STACK_ARGS test --bench --no-run-benchmarks --haddock --no-haddock-deps
