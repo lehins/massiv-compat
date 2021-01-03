@@ -8,7 +8,7 @@ license-file:        LICENSE
 author:              Alexey Kuleshevich
 maintainer:          alexey@kuleshevi.ch
 copyright:           2021 Alexey Kuleshevich
-category:            Algorithms
+category:            Array, Data Structures, Serialization
 build-type:          Simple
 extra-source-files:  README.md
                    , CHANGELOG.md
