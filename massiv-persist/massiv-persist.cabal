@@ -64,7 +64,6 @@ test-suite tests
                       -fno-warn-orphans
                       -threaded
                       -with-rtsopts=-N2
-                      -O0
 
 test-suite doctests
   type:             exitcode-stdio-1.0

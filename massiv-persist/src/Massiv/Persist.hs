@@ -43,10 +43,10 @@ module Massiv.Persist
   , mkSzFail
   , putArray
   , getArray
-  , putPrimArrayHE
-  , getPrimArrayHE
-  , putStorableArrayHE
-  , getStorableArrayHE
+  , putPrimArray
+  , getPrimArray
+  , putStorableArray
+  , getStorableArray
   ) where
 
 import Control.DeepSeq (NFData)
@@ -159,22 +159,30 @@ instance (Index ix, Unbox e, Persist e) => Persist (Array U ix e) where
   get = getArray
 
 -- | Serialize array as `LittleEndian`
+--
+-- @since 0.1.0
 putArray :: (Manifest r ix e, Persist e) => Array r ix e -> Put ()
 putArray arr = do
   putArrayHeader arr
   A.mapM_ put arr
 
+-- | Deserialize array from binary form in `LittleEndian`
+--
+-- @since 0.1.0
 getArray :: (Mutable r ix e, Persist e) => Get (Array r ix e)
 getArray = do
   comp <- get
   sz <- get
   setComp comp <$> A.makeArrayA sz (const get)
 
--- | Serialize primitive array in the host endian order
+-- | Serialize primitive array in `LittleEndian` order
 --
 -- @since 0.1.0
-putPrimArrayHE :: forall ix e . (Index ix, Prim e, Persist e) => Array P ix e -> Put ()
-putPrimArrayHE arr = do
+putPrimArray :: forall ix e . (Index ix, Prim e, Persist e) => Array P ix e -> Put ()
+putPrimArray arr = do
+#ifdef WORDS_BIGENDIAN
+  putArray
+#else
   putArrayHeader arr
   let eltBytes = Primitive.sizeOf (undefined :: e)
       n = totalElem (size arr) * eltBytes
@@ -186,12 +194,16 @@ putPrimArrayHE arr = do
   Put $ \_ p -> do
     SBS.copyToPtr s (unwrapByteArrayOffset arr * eltBytes) p n
     pure $! p `plusPtr` n :!: ()
+#endif
 
--- | Deserialize primitive array in the host endian order
+-- | Deserialize primitive array in `LittleEndian` order
 --
 -- @since 0.1.0
-getPrimArrayHE :: forall ix e . (Index ix, Prim e, Persist e) => Get (Array P ix e)
-getPrimArrayHE = do
+getPrimArray :: forall ix e . (Index ix, Prim e, Persist e) => Get (Array P ix e)
+getPrimArray = do
+#ifdef WORDS_BIGENDIAN
+  getArray
+#else
   comp <- get
   sz <- get
   let n = totalElem sz * Primitive.sizeOf (undefined :: e)
@@ -199,34 +211,37 @@ getPrimArrayHE = do
   SBS.SBS sbs <- SBS.toShort <$!> getBytes n
   either (Fail.fail . show) pure $
     resizeM sz (fromByteArray comp (BA.ByteArray sbs))
-
-instance (Index ix, Prim e, Persist e) => Persist (Array P ix e) where
-#ifdef WORDS_BIGENDIAN
-  put = putArray
-  get = getArray
-#else
-  put = putPrimArrayHE
-  get = getPrimArrayHE
 #endif
 
+instance (Index ix, Prim e, Persist e) => Persist (Array P ix e) where
+  put = putPrimArray
+  get = getPrimArray
 
--- | Serialize storable array in the host endian order
+
+-- | Serialize storable array in `LittleEndian` order
 --
 -- @since 0.1.0
-putStorableArrayHE :: forall ix e . (Index ix, Storable e, Persist e) => Array S ix e -> Put ()
-putStorableArrayHE arr = do
+putStorableArray :: forall ix e . (Index ix, Storable e, Persist e) => Array S ix e -> Put ()
+putStorableArray arr = do
+#ifdef WORDS_BIGENDIAN
+  puArray
+#else
   let _ = put (undefined :: e) -- force `Persist` constraint
   putArrayHeader arr
   putByteString $!
     case unsafeArrayToForeignPtr arr of
       (fp, len) ->
         BS.PS (castForeignPtr fp) 0 (len * Storable.sizeOf (undefined :: e))
+#endif
 
--- | Deserialize storable array in the host endian order
+-- | Deserialize storable array in `LittleEndian` order
 --
 -- @since 0.1.0
-getStorableArrayHE :: forall ix e . (Index ix, Storable e, Persist e) => Get (Array S ix e)
-getStorableArrayHE = do
+getStorableArray :: forall ix e . (Index ix, Storable e, Persist e) => Get (Array S ix e)
+getStorableArray = do
+#ifdef WORDS_BIGENDIAN
+  getArray
+#else
   comp <- get
   sz <- get
   let eltCount = totalElem sz
@@ -236,13 +251,8 @@ getStorableArrayHE = do
   either (Fail.fail . show) pure $
     resizeM sz $
     unsafeArrayFromForeignPtr0 comp (fp `plusForeignPtr` off) (Sz eltCount)
-
+#endif
 
 instance (Index ix, Storable e, Persist e) => Persist (Array S ix e) where
-#ifdef WORDS_BIGENDIAN
-  put = putArray
-  get = getArray
-#else
-  put = putStorableArrayHE
-  get = getStorableArrayHE
-#endif
+  put = putStorableArray
+  get = getStorableArray
