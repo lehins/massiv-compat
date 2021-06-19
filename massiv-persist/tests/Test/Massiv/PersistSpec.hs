@@ -17,7 +17,8 @@ roundtrip val = either error id (decode (encode val)) === val
 
 roundtripArray ::
      forall r ix e.
-     ( Mutable r ix e
+     ( Mutable r e
+     , Index ix
      , Persist e
      , Persist (Array r ix e)
      , Eq (Array r ix e)
@@ -40,7 +41,8 @@ roundtripArraySpec ::
      , Typeable ix
      , Typeable e
      , Arbitrary ix
-     , Mutable r ix e
+     , Load r ix e
+     , Mutable r e
      , Arbitrary e
      , Persist e
      , Persist (Array r ix e)

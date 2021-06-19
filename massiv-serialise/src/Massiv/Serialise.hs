@@ -136,8 +136,9 @@ instance Index ix => Serialise (Sz ix) where
 -- @since 0.1.0
 encodeArray ::
      forall v r ix e.
-     ( Manifest r ix e
-     , Mutable (ARepr v) ix e
+     ( Manifest r e
+     , Load r ix e
+     , Mutable (ARepr v) e
      , VG.Vector v e
      , VRepr (ARepr v) ~ v
      , Serialise (v e)
@@ -154,8 +155,9 @@ decodeArray ::
      forall v r ix e s.
      ( Typeable v
      , VG.Vector v e
-     , Mutable (ARepr v) ix e
-     , Mutable r ix e
+     , Load r ix e
+     , Load (ARepr v) ix e
+     , Mutable r e
      , Serialise (v e)
      )
   => Decoder s (Array r ix e)
@@ -163,16 +165,19 @@ decodeArray = do
   comp <- decode
   sz <- decode
   vector :: v e <- decode
-  -- setComp is to workaround a minor bug for boxed arrays in massiv < 0.6
-  either (Fail.fail . show) (pure . setComp comp) $ fromVectorM comp sz vector
+  either (Fail.fail . show) pure $ fromVectorM comp sz vector
 
-instance (Index ix, Serialise e) => Serialise (Array B ix e) where
+instance (Index ix, Serialise e) => Serialise (Array BL ix e) where
   encode = encodeArray @V.Vector
   decode = decodeArray @V.Vector
 
-instance (Index ix, NFData e, Serialise e) => Serialise (Array N ix e) where
+instance (Index ix, NFData e, Serialise e) => Serialise (Array B ix e) where
+  encode = encode . toLazyArray
+  decode = evalLazyArray <$> decode
+
+instance (Index ix, NFData e, Serialise e) => Serialise (Array BN ix e) where
   encode = encode . unwrapNormalForm
-  decode = evalNormalForm <$> decode
+  decode = forceLazyArray <$> decode
 
 instance (Index ix, Storable e, Serialise e) => Serialise (Array S ix e) where
   encode = encodeArray @VS.Vector

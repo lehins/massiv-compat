@@ -35,7 +35,6 @@ roundtripArraySpec ::
      , Typeable ix
      , Typeable e
      , Arbitrary ix
-     , Construct r ix e
      , Load r ix e
      , Arbitrary e
      , Serialise (Array r ix e)
@@ -104,9 +103,15 @@ spec = do
         roundtripArraySpec @B @Ix3 @Integer
         roundtripArraySpec @B @Ix4 @Integer
         roundtripArraySpec @B @Ix5 @Integer
-      describe "N" $ do
-        roundtripArraySpec @N @Ix1 @Integer
-        roundtripArraySpec @N @Ix2 @Integer
-        roundtripArraySpec @N @Ix3 @Integer
-        roundtripArraySpec @N @Ix4 @Integer
-        roundtripArraySpec @N @Ix5 @Integer
+      describe "BN" $ do
+        roundtripArraySpec @BN @Ix1 @Integer
+        roundtripArraySpec @BN @Ix2 @Integer
+        roundtripArraySpec @BN @Ix3 @Integer
+        roundtripArraySpec @BN @Ix4 @Integer
+        roundtripArraySpec @BN @Ix5 @Integer
+      describe "BL" $ do
+        roundtripArraySpec @BL @Ix1 @Integer
+        roundtripArraySpec @BL @Ix2 @Integer
+        roundtripArraySpec @BL @Ix3 @Integer
+        roundtripArraySpec @BL @Ix4 @Integer
+        roundtripArraySpec @BL @Ix5 @Integer

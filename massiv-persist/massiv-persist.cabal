@@ -1,5 +1,5 @@
 name:                massiv-persist
-version:             0.1.0.0
+version:             1.0.0.0
 synopsis:            Compatibility of 'massiv' with 'persist'
 description:         Orphan 'Persist' class instances from <https://hackage.haskell.org/package/persist persist> package that allow serialization of arrays defined in <https://hackage.haskell.org/package/massiv massiv> package
 homepage:            https://github.com/lehins/massiv-compat
@@ -30,7 +30,7 @@ library
   build-depends:       base >= 4.8 && < 5
                      , bytestring
                      , deepseq
-                     , massiv >= 0.5.9.0
+                     , massiv >= 1.0.0.0
                      , persist
                      , primitive
 
@@ -50,7 +50,7 @@ test-suite tests
   build-tool-depends: hspec-discover:hspec-discover
   build-depends:      base             >= 4.8 && < 5
                     , massiv-persist
-                    , massiv-test >= 0.1.5
+                    , massiv-test >= 1.0.0
                     , massiv
                     , persist
                     , hspec

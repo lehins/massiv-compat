@@ -138,10 +138,7 @@ instance Index ix => Persist (Sz ix) where
 
 
 -- | Serialize array computation startegy and size
-putArrayHeader ::
-     forall r ix e. Manifest r ix e
-  => Array r ix e
-  -> Put ()
+putArrayHeader :: forall r ix e. (Strategy r, Size r, Index ix) => Array r ix e -> Put ()
 putArrayHeader arr = do
   put (getComp arr)
   put (size arr)
@@ -161,7 +158,7 @@ instance (Index ix, Unbox e, Persist e) => Persist (Array U ix e) where
 -- | Serialize array as `LittleEndian`
 --
 -- @since 0.1.0
-putArray :: (Manifest r ix e, Persist e) => Array r ix e -> Put ()
+putArray :: (Manifest r e, Index ix, Persist e) => Array r ix e -> Put ()
 putArray arr = do
   putArrayHeader arr
   A.mapM_ put arr
@@ -169,7 +166,7 @@ putArray arr = do
 -- | Deserialize array from binary form in `LittleEndian`
 --
 -- @since 0.1.0
-getArray :: (Mutable r ix e, Persist e) => Get (Array r ix e)
+getArray :: (Mutable r e, Index ix, Persist e) => Get (Array r ix e)
 getArray = do
   comp <- get
   sz <- get
