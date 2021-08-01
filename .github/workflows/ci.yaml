@@ -48,7 +48,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        resolver: [nightly, lts-16, lts-14, lts-12]
+        resolver: [nightly, lts-18, lts-16, lts-14, lts-12]
         os: [ubuntu-latest]
         include:
           - resolver: lts-12
@@ -59,7 +59,9 @@ jobs:
             stack-yaml: stack-old.yaml
           - resolver: lts-16
             ghc: 8.8.4
-            stack-yaml: stack.yaml
+            stack-yaml: stack-old.yaml
+          - resolver: lts-18
+            ghc: 8.10.4
           # Latest stable for MacOS: ghc-8.8.4
           - resolver: lts-16
             os: macos-latest
