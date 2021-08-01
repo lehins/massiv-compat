@@ -171,7 +171,7 @@ instance (Index ix, Serialise e) => Serialise (Array BL ix e) where
   encode = encodeArray @V.Vector
   decode = decodeArray @V.Vector
 
-instance (Index ix, NFData e, Serialise e) => Serialise (Array B ix e) where
+instance (Index ix, Serialise e) => Serialise (Array B ix e) where
   encode = encode . toLazyArray
   decode = evalLazyArray <$> decode
 

@@ -147,7 +147,11 @@ instance (Index ix, Persist e) => Persist (Array B ix e) where
   put = putArray
   get = getArray
 
-instance (Index ix, NFData e, Persist e) => Persist (Array N ix e) where
+instance (Index ix, Persist e) => Persist (Array BL ix e) where
+  put = putArray
+  get = getArray
+
+instance (Index ix, NFData e, Persist e) => Persist (Array BN ix e) where
   put = putArray
   get = getArray
 
