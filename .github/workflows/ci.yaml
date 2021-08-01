@@ -65,6 +65,7 @@ jobs:
           # Latest stable for MacOS: ghc-8.8.4
           - resolver: lts-16
             os: macos-latest
+            stack-yaml: stack-old.yaml
           # Latest stable for Windows: ghc-8.6.5
           - resolver: lts-14
             os: windows-latest

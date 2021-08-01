@@ -67,21 +67,11 @@ spec = do
       prop "Sz5" $ roundtrip @Sz5
     describe "Array" $ do
       describe "P" $ do
-        roundtripArraySpec @P @Ix1 @Word8
-        roundtripArraySpec @P @Ix2 @Word8
-        roundtripArraySpec @P @Ix3 @Word8
-        roundtripArraySpec @P @Ix4 @Word8
-        roundtripArraySpec @P @Ix5 @Word8
         roundtripArraySpec @P @Ix1 @Word16
         roundtripArraySpec @P @Ix2 @Word16
         roundtripArraySpec @P @Ix3 @Word16
         roundtripArraySpec @P @Ix4 @Word16
         roundtripArraySpec @P @Ix5 @Word16
-        roundtripArraySpec @P @Ix1 @Word32
-        roundtripArraySpec @P @Ix2 @Word32
-        roundtripArraySpec @P @Ix3 @Word32
-        roundtripArraySpec @P @Ix4 @Word32
-        roundtripArraySpec @P @Ix5 @Word32
         roundtripArraySpec @P @Ix1 @Word64
         roundtripArraySpec @P @Ix2 @Word64
         roundtripArraySpec @P @Ix3 @Word64
@@ -99,21 +89,11 @@ spec = do
         roundtripArraySpec @U @Ix4 @(Int, Word)
         roundtripArraySpec @U @Ix5 @(Int, Word)
       describe "S" $ do
-        roundtripArraySpec @S @Ix1 @Word8
-        roundtripArraySpec @S @Ix2 @Word8
-        roundtripArraySpec @S @Ix3 @Word8
-        roundtripArraySpec @S @Ix4 @Word8
-        roundtripArraySpec @S @Ix5 @Word8
         roundtripArraySpec @S @Ix1 @Word16
         roundtripArraySpec @S @Ix2 @Word16
         roundtripArraySpec @S @Ix3 @Word16
         roundtripArraySpec @S @Ix4 @Word16
         roundtripArraySpec @S @Ix5 @Word16
-        roundtripArraySpec @S @Ix1 @Word32
-        roundtripArraySpec @S @Ix2 @Word32
-        roundtripArraySpec @S @Ix3 @Word32
-        roundtripArraySpec @S @Ix4 @Word32
-        roundtripArraySpec @S @Ix5 @Word32
         roundtripArraySpec @S @Ix1 @Word64
         roundtripArraySpec @S @Ix2 @Word64
         roundtripArraySpec @S @Ix3 @Word64
