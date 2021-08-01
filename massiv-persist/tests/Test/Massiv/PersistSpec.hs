@@ -38,7 +38,6 @@ roundtripArraySpec ::
      forall r ix e.
      ( Eq (Array r ix e)
      , Show (Array r ix e)
-     , Typeable ix
      , Typeable e
      , Arbitrary ix
      , Load r ix e
