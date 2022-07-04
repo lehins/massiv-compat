@@ -1,0 +1,6 @@
+work-dir: ".stack-work-root"
+resolver: lts-19.14
+packages:
+- ./massiv-persist
+- ./massiv-serialise
+extra-deps: []
